@@ -11,7 +11,8 @@ class Menu:
     width, height = pyautogui.size()
 
     def __init__(self):
-        self.detection_object = FaceDetection()
+        if self.detection_object is None:
+            self.detection_object = FaceDetection()
         self.detection_object.initialize()
         self.setup_window(self.initialize_window_size(400, 300))
         self.set_buttons_to_window()
@@ -113,9 +114,14 @@ class Menu:
         if result == 1:
             self.pop_message("Success.", "Image have been saved.")
             self.__init__()
-
-        else:
+        elif result == -1:
             self.pop_message("Fail.", "Could not detect any face try again!")
+            self.__init__()
+        elif result == 0:
+            self.pop_message("Warning.", "We already know you!")
+            self.__init__()
+        else:
+            self.pop_message("Warning.", "Please change the name and try again.")
             self.__init__()
 
     def pop_message(self, title, message):

@@ -7,10 +7,12 @@ import os
 class FaceDetection:
     known_face_encodings = []
     known_face_names = []
+    number_training_set = 0
 
     def initialize(self):
-        self.known_face_encodings = self.encoding_face()[1]
-        self.known_face_names = self.encoding_face()[0]
+        if self.number_training_set == 0:
+            self.known_face_encodings = self.encoding_face()[1]
+            self.known_face_names = self.encoding_face()[0]
 
     def face_detection_from_camera(self):
         video_cap = cv2.VideoCapture(0)
@@ -54,6 +56,8 @@ class FaceDetection:
 
     def encoding_face(self):
         path = os.getcwd()
+        counter = 0
+
         if not path.__contains__('training_set'):
             if not path.__contains__('images'):
                 os.chdir("images")
@@ -64,6 +68,7 @@ class FaceDetection:
         face_names_list = []
 
         for filename in os.listdir(path):
+            counter = counter + 1
             image = face_recognition.load_image_file(filename)
             face_encoding = face_recognition.face_encodings(image)[0]
             face_encodings_list.append(face_encoding)
@@ -71,6 +76,8 @@ class FaceDetection:
             name = name.replace('.png', '')
             name = name.replace('.jpeg', '')
             face_names_list.append(name)
+
+        self.number_training_set = counter
 
         return [face_names_list, face_encodings_list]
 
@@ -107,6 +114,11 @@ class FaceDetection:
         if not os.getcwd().__contains__("training_set"):
             os.chdir("./images/training_set")
 
+        check_name = self.check_new_face_name(filename)
+
+        if check_name == 0:
+            return -2
+
         if not filename.__contains__(".jpg") or filename.__contains__(".jpeg") or filename.__contains__(".png"):
             filename = filename + ".jpg"
 
@@ -122,13 +134,28 @@ class FaceDetection:
                 cv2.destroyWindow("Video")
                 cv2.imwrite(filename, frame)
                 return self.face_detection_check(filename)
-                break
 
     def face_detection_check(self, image_name):
-        image = face_recognition.load_image_file(image_name)
-        face_locations = face_recognition.face_locations(image)
+        test_image = face_recognition.load_image_file(image_name)
+        face_locations = face_recognition.face_locations(test_image)
+        face_encodings = face_recognition.face_encodings(test_image, face_locations)
+
+        for test, face_encoding in zip(face_locations, face_encodings):
+            matches = face_recognition.compare_faces(self.known_face_encodings, face_encoding, tolerance=0.5)
+            if True in matches:
+                os.remove(image_name)
+                return 0
+                break
+
         if len(face_locations) == 1:
             return 1
         else:
             os.remove(image_name)
-            return 0
+            return -1
+
+    def check_new_face_name(self, name):
+        for names in self.known_face_names:
+            if name == names:
+                return 0
+            else:
+                return 1
