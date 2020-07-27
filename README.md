@@ -29,7 +29,7 @@ To run the code you need to create two folders separately.
  When you run the source code successfully, you will see a window that has four buttons which are Image, Camera, Add New Face, and Face Detection. 
  
  
- 1)Image Button
+ 1) Image Button
  
  When you click the Image button, it will ask you for an Image Name. 
  This post looks inside the 'images' folder so you need to write the image name that is inside the 'images' folder. 
