@@ -31,9 +31,10 @@ To run the code you need to create two folders separately.
  
  1)Image Button
  
-	 When you click the Image button, it will ask you for an Image Name. This post looks inside the 'images' folder so you need to write the image name that is inside 
-	 the 'images' folder. If the image that the user entered exists, it will detect the faces in the image and it will print the name of the person it knows the person. 
-	 Otherwise, it will just print “unknown”. 
+ When you click the Image button, it will ask you for an Image Name. 
+ This post looks inside the 'images' folder so you need to write the image name that is inside the 'images' folder. 
+ If the image that the user entered exists, it will detect the faces in the image and it will print the name of the person it knows the person. 
+ Otherwise, it will just print “unknown”. 
 	 
  2) Camera
  
