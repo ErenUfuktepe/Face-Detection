@@ -115,22 +115,26 @@ def learn_new_face():
 
 # Load previous encodings
 def load_faces():
-    global PATH, TRAINED, df
+    global PATH, TRAINED, DELETE_IMAGE_AFTER_SAVE, df
 
-    directory = os.path.join(PATH, TRAINED)
-    if not os.path.isfile(os.path.join(PATH, TRAINED)):
-        for filename in os.listdir(PATH):
-            if is_allowed(filename):
-                image = face_recognition.load_image_file(os.path.join(PATH, filename))
+    df_directory = os.path.join(PATH, TRAINED)
+    for filename in os.listdir(PATH):
+        image_directory = os.path.join(PATH, filename)
+        if is_allowed(filename):
+            image = face_recognition.load_image_file(image_directory)
+            person_name = filename.split('.')[0]
+            if not df[df['name'] == person_name].shape[0] > 0:
                 data = {
-                    'name': filename.split('.')[0],
+                    'name': person_name,
                     'filename': filename,
                     'encoding': face_recognition.face_encodings(image)[0]
                 }
                 df.loc[len(df)] = data
-    else:
-        df = pd.read_parquet(directory)
-    df.to_parquet(directory, index=True)
+            if DELETE_IMAGE_AFTER_SAVE:
+                os.remove(image_directory)
+    # Update the file if there are new faces in data folder
+    df.to_parquet(df_directory, index=True)
+    df = pd.read_parquet(df_directory)
 
 
 # Face detection with haarcascade
@@ -181,6 +185,7 @@ df = pd.DataFrame(columns=['name', 'filename', 'encoding'])
 # Constants
 UNKNOWN = 'Unknown Person'
 ALLOWED_FILE_TYPES = ['jpeg', 'png', 'jpg']
+DELETE_IMAGE_AFTER_SAVE = True # Delete the image after we add the image to parquet file
 
 # Main frame size
 WIDTH = 250
